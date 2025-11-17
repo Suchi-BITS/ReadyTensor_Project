@@ -1,1 +1,202 @@
+RAG Console Application
 
+A modular Retrieval-Augmented Generation (RAG) system built using LangChain 0.3+, ChromaDB, HuggingFace embeddings, and CrossEncoder reranking.
+
+Features
+
+RAG pipeline combining vector search and reranking
+
+Automatic ingestion of text files from the data folder
+
+Persistent ChromaDB vector store
+
+HuggingFace MiniLM embeddings (CPU compatible)
+
+Smart chunking using token-based splitting
+
+LLM fallback chain with OpenAI and Groq
+
+Clean source code structure (app.py, vectordb.py)
+
+Configuration through environment variables
+
+Folder Structure
+project/
+│
+├── data/                   # Place .txt documents here
+│     └── *.txt
+│
+├── chroma_store/           # Auto-persisted Chroma DB files
+│
+├── src/
+│     ├── app.py            # Main application and RAG interface
+│     └── vectordb.py       # Vector DB wrapper
+│
+├── .env                    # API keys and configuration
+└── README.md
+
+Architecture Overview
+1. Document Ingestion
+
+Reads all .txt files from the data folder
+
+Splits content into meaningful chunks using:
+
+Paragraph-based splitting
+
+Token-based splitting for long sections
+
+2. Embedding Layer
+
+Generates normalized embeddings using HuggingFace MiniLM
+
+Implemented with langchain-huggingface
+
+3. Vector Store
+
+Uses ChromaDB from langchain-chroma
+
+Stores embeddings in chroma_store
+
+Automatically persists updates
+
+4. Reranking
+
+Uses CrossEncoder (ms-marco-MiniLM-L-6-v2)
+
+Reranks initially retrieved chunks based on semantic relevance
+
+5. LLM Layer
+
+Order of usage:
+
+OpenAI (gpt-4o-mini)
+
+Groq (llama-3.1-8b-instant)
+
+Retrieval-only fallback if no LLM key is provided
+
+6. Console Interaction
+
+Simple interactive prompt
+
+Displays answer, context, and sources
+
+Required .env Keys
+
+Create a .env file at the project root:
+
+# OpenAI (primary model)
+OPENAI_API_KEY=your_openai_key
+OPENAI_MODEL=gpt-4o-mini
+
+# Groq (fallback)
+GROQ_API_KEY=your_groq_key
+GROQ_MODEL=llama-3.1-8b-instant
+
+# Embeddings
+EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+
+# Chroma collection
+CHROMA_COLLECTION_NAME=rag_documents
+
+
+Note: Gemini was intentionally removed due to incompatibility with latest Google SDK changes.
+
+Installation Steps
+
+Clone the repository
+
+git clone <your_repo_url>
+cd your_repo_name
+
+
+Create and activate a virtual environment
+
+python -m venv venv
+venv\Scripts\activate   # Windows
+
+
+Upgrade pip
+
+python -m pip install --upgrade pip
+
+
+Install dependencies (no versions to avoid conflicts)
+
+Add these to your requirements.txt:
+
+langchain
+langchain-core
+langchain-community
+langchain-chroma
+langchain-huggingface
+langchain-text-splitters
+
+chromadb
+sentence-transformers
+numpy
+tiktoken
+
+openai
+groq
+
+python-dotenv
+requests
+pydantic
+typing-extensions
+
+
+Install them:
+
+pip install -r requirements.txt
+
+Running the Application
+python src/app.py
+
+
+The console will start and ingest all files in the data folder.
+Input your questions directly into the prompt.
+
+How the System Works
+
+Loads all .txt documents from the data folder
+
+Splits them into optimized chunks
+
+Generates embeddings for each chunk
+
+Stores embeddings in ChromaDB
+
+On a query:
+
+Retrieves top candidate chunks
+
+Reranks using CrossEncoder
+
+Selects the most relevant context
+
+Sends to the LLM (OpenAI or Groq)
+
+Returns a concise answer with context and sources
+
+Managing the Vector Store
+
+To clear the chroma_store:
+
+from vectordb import VectorDB
+v = VectorDB("rag_documents", "sentence-transformers/all-MiniLM-L6-v2")
+v.clear_collection()
+
+
+Or delete the chroma_store directory manually.
+
+Notes
+
+Only plain text files should be placed in the data folder.
+
+Restart the app when new documents are added.
+
+The system is designed to run on CPU and does not require GPU.
+
+You may switch to larger HuggingFace embeddings if needed.
