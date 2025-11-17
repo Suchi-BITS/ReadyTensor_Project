@@ -17,7 +17,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
 from langchain_groq import ChatGroq
-from langchain_google_genai import ChatGoogleGenerativeAI
+#from langchain_google_genai import ChatGoogleGenerativeAI
 
 # Local module
 from vectordb import VectorDB
@@ -78,12 +78,12 @@ class RAGApp:
             except Exception as e:
                 print(f"⚠ Groq failed: {e}")
         
-        if GOOGLE_API_KEY:
+        '''if GOOGLE_API_KEY:
             try:
                 print(f" Using Gemini model: {GOOGLE_MODEL}")
                 return ChatGoogleGenerativeAI(model=GOOGLE_MODEL, temperature=0)
             except Exception as e:
-                print(f"⚠ Gemini failed: {e}")
+                print(f"⚠ Gemini failed: {e}")'''
         
         print(" No LLM API key found — retrieval-only mode.")
         return None
